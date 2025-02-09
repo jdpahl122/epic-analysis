@@ -15,6 +15,7 @@ fastapi = "*"
 requests = "*"
 beautifulsoup4 = "*"
 torch = "*"
+psycopg2 = "*"
 sentence-transformers = "*"
 
 [dev-packages]
