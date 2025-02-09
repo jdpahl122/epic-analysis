@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+langchain = "*"
+langchain-experimental = "*"
+ollama = "*"
+openai = "*"
+psycopg2-binary = "*"
+sqlalchemy = "*"
+pgvector = "*"
+fastapi = "*"
+requests = "*"
+beautifulsoup4 = "*"
+torch = "*"
+sentence-transformers = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.13"
