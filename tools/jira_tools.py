@@ -11,7 +11,7 @@ JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN")
 JIRA_BOARD_ID = os.getenv("JIRA_BOARD_ID")
 
 def get_historic_epics():
-    """Fetches epics from a specific Jira board, excluding already stored ones."""
+    """Fetches epics from a specific Jira board and excludes already stored ones."""
     url = f"{JIRA_BASE_URL}/rest/agile/1.0/board/{JIRA_BOARD_ID}/epic"
     response = requests.get(url, auth=(JIRA_EMAIL, JIRA_API_TOKEN))
 
@@ -25,9 +25,9 @@ def get_historic_epics():
     for epic in all_epics:
         epic_id = epic["id"]
 
-        if check_if_epic_exists(epic_id):  # ✅ Now correctly imported
+        if check_if_epic_exists(epic_id):  # ✅ Prevent storing duplicate epics
             print(f"✅ Epic {epic_id} already exists. Skipping.")
-            continue  # Skip already stored epics
+            continue
 
         issues = get_epic_issues(epic_id)
         new_epics.append({"epic_id": epic_id, "summary": epic["summary"], "issues": issues})
