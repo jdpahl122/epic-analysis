@@ -65,8 +65,6 @@ OLLAMA_MODEL=deepseek-r1:14b
 │   │── text_processing.py         # Text extraction & NLP utilities
 │── /models
 │   │── vector_store.py            # PostgreSQL pgvector-based vector database
-│── /data
-│   │── epic_samples.json          # Sample epics and issues for testing
 ```
 
 ---

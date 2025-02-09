@@ -1,7 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
-from models.vector_store import check_if_epic_exists  # ✅ Import from vector_store.py
+from models.vector_store import check_if_epic_exists
 
 load_dotenv()
 
