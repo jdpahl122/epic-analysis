@@ -1,11 +1,13 @@
 import os
 import numpy as np
 import psycopg2
+from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from pgvector.sqlalchemy import Vector
 from sentence_transformers import SentenceTransformer
 
+load_dotenv()
 # Load environment variables
 DB_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/epic_db")
 engine = create_engine(DB_URL)
