@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+from models.vector_store import check_if_epic_exists  # ✅ Import from vector_store.py
 
 load_dotenv()
 
@@ -23,7 +24,9 @@ def get_historic_epics():
 
     for epic in all_epics:
         epic_id = epic["id"]
-        if check_if_epic_exists(epic_id):
+
+        if check_if_epic_exists(epic_id):  # ✅ Now correctly imported
+            print(f"✅ Epic {epic_id} already exists. Skipping.")
             continue  # Skip already stored epics
 
         issues = get_epic_issues(epic_id)
