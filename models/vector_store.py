@@ -22,10 +22,13 @@ def embed_text(text):
     return model.encode(text).tolist()
 
 def check_if_epic_exists(epic_id):
-    """Check if an epic has already been processed."""
+    """Check if an epic has already been processed (forcing epic_id to string)."""
     with SessionLocal() as session:
-        result = session.execute(text("SELECT COUNT(*) FROM epics WHERE epic_id = :epic_id"), {"epic_id": epic_id})
-        return result.scalar() > 0
+        result = session.execute(
+            text("SELECT COUNT(*) FROM epics WHERE epic_id = :epic_id"),
+            {"epic_id": str(epic_id)}  # ✅ Convert to string
+        )
+        return result.scalar() > 0  # Returns True if epic exists
 
 def store_epic(epic_id, epic_text):
     """Store a new epic if it hasn't been stored yet."""
