@@ -17,6 +17,7 @@ beautifulsoup4 = "*"
 torch = "*"
 psycopg2 = "*"
 sentence-transformers = "*"
+langchain-ollama = "*"
 
 [dev-packages]
 
