@@ -2,6 +2,9 @@ import os
 from langchain.chains import LLMChain
 from langchain_community.llms import Ollama
 from langchain.prompts import PromptTemplate
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def epic_comparison_agent(epic_data, similar_epics):
     """Compares target epic against historic data to find gaps."""
