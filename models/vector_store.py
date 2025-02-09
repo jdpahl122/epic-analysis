@@ -71,3 +71,18 @@ def store_epic(epic):
         session.commit()
 
     print(f"✅ Stored epic {epic_id} with {len(epic['issues'])} issues and vector embeddings.")
+
+def query_similar_epics(query_embedding, top_n=5):
+    """Find the most similar epics using pgvector similarity search."""
+    with SessionLocal() as session:
+        result = session.execute(
+            text("""
+                SELECT epic_id, key, name, summary, description, issues, embedding <=> CAST(:query_embedding AS vector) AS similarity
+                FROM epics
+                ORDER BY similarity ASC
+                LIMIT :top_n;
+            """),
+            {"query_embedding": "[" + ",".join(map(str, query_embedding.tolist())) + "]", "top_n": top_n}  # ✅ Properly format the array
+        )
+
+        return result.fetchall()
