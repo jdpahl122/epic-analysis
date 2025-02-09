@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-JIRA_BOARD_ID = os.getenv("JIRA_BOARD_ID")  # ✅ Ensure we use the board ID
+JIRA_BOARD_ID = os.getenv("JIRA_BOARD_ID")
 
 def store_historic_epics():
     """Fetches epics from a specific Jira board and stores them as embeddings, avoiding duplicates."""
@@ -13,15 +13,7 @@ def store_historic_epics():
     all_epics = get_historic_epics()
 
     for epic in all_epics:
-        epic_id = epic["epic_id"]
-
-        if check_if_epic_exists(epic_id):
-            print(f"✅ Epic {epic_id} already stored, skipping...")
-            continue  # Skip already stored epics
-
-        epic_text = f"{epic['summary']} {epic['issues']}"
-        store_epic(epic_id, epic_text)
-        print(f"📌 Stored epic {epic_id}")
+        store_epic(epic)
 
     print("✅ All historic epics processed.")
 
