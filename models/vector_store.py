@@ -21,7 +21,7 @@ def embed_text(text):
     """Generate a vector embedding."""
     return model.encode(text).tolist()
 
-def epic_exists(epic_id):
+def check_if_epic_exists(epic_id):
     """Check if an epic has already been processed."""
     with SessionLocal() as session:
         result = session.execute(text("SELECT COUNT(*) FROM epics WHERE epic_id = :epic_id"), {"epic_id": epic_id})
@@ -29,7 +29,7 @@ def epic_exists(epic_id):
 
 def store_epic(epic_id, epic_text):
     """Store a new epic if it hasn't been stored yet."""
-    if epic_exists(epic_id):
+    if check_if_epic_exists(epic_id):
         print(f"⚠️ Epic {epic_id} already stored. Skipping.")
         return
 
