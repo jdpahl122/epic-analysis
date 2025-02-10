@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import json
 from langchain_ollama import OllamaLLM
