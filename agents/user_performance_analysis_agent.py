@@ -1,58 +1,67 @@
-import os
 import numpy as np
-import json
-from langchain_ollama import OllamaLLM
-from langchain.prompts import PromptTemplate
+from langchain_community.llms import Ollama
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
 def analyze_user_performance(user_email, issues):
-    """Uses LLM to analyze a developer's performance based on past 6 months of work."""
+    """Analyzes user performance based on ticket complexity, completion speed, and work scope."""
     
     if not issues:
-        return f"❌ No issues found for user {user_email} in the past 6 months."
+        return f"⚠️ No Jira issues found for {user_email} in the last 6 months."
 
-    llm = OllamaLLM(model=os.getenv("OLLAMA_MODEL"))
+    # Calculate average resolution time
+    resolved_issues = [i for i in issues if i["resolution_time"] is not None]
+    avg_resolution_time = (
+        np.mean([i["resolution_time"] for i in resolved_issues])
+        if resolved_issues else "N/A"
+    )
 
-    avg_completion_time = np.mean([
-        (np.datetime64(issue["resolved"]) - np.datetime64(issue["created"])).astype(int)
-        for issue in issues if issue["resolved"]
-    ]) if any(issue["resolved"] for issue in issues) else "N/A"
-
-    avg_story_points = np.mean([
-        issue["story_points"] for issue in issues if issue["story_points"]
-    ]) if any(issue["story_points"] for issue in issues) else "N/A"
-
-    ticket_types = {issue["type"] for issue in issues}
+    # Categorize work type (new features, bug fixes, maintenance)
+    new_feature_keywords = ["feature", "implement", "add", "deploy"]
+    maintenance_keywords = ["fix", "patch", "update", "migrate"]
     
-    prompt = PromptTemplate(
-        input_variables=["issues", "avg_completion_time", "avg_story_points", "ticket_types"],
-        template="""
-        You are a software engineering performance analyst.
+    new_features = []
+    maintenance = []
+    unresolved_issues = []
+    
+    for issue in issues:
+        title = issue["summary"].lower()
         
-        The following developer has completed tasks in the past 6 months:
-        {issues}
+        if any(keyword in title for keyword in new_feature_keywords):
+            new_features.append(issue)
+        elif any(keyword in title for keyword in maintenance_keywords):
+            maintenance.append(issue)
+        else:
+            unresolved_issues.append(issue)
 
-        Their **average ticket completion time** is **{avg_completion_time} days**.
-        Their **average story points per ticket** is **{avg_story_points}**.
-        The ticket types they worked on include: {ticket_types}.
+    # Summarize issue breakdown
+    issue_summary = f"""
+    📌 **User Performance Report for {user_email}**
+    
+    - **Total Issues Assigned:** {len(issues)}
+    - **Issues Resolved:** {len(resolved_issues)}
+    - **Average Resolution Time:** {avg_resolution_time} days
+    - **New Feature Work:** {len(new_features)}
+    - **Maintenance/Bug Fix Work:** {len(maintenance)}
+    - **Unresolved Issues:** {len(unresolved_issues)}
+    """
 
-        Analyze their performance and answer:
-        1. What is their perceived work difficulty based on ticket descriptions?
-        2. Are they resolving issues faster or slower than expected?
-        3. Are they working mostly on new features, bugs, or refactoring?
-        4. Do they need improvement in any area?
-        """
-    )
+    # Generate insights using LLM
+    prompt = f"""
+    Based on this analysis:
+    
+    {issue_summary}
 
-    analysis = llm.invoke(
-        prompt.format(
-            issues=json.dumps(issues, indent=2),
-            avg_completion_time=avg_completion_time,
-            avg_story_points=avg_story_points,
-            ticket_types=", ".join(ticket_types)
-        )
-    )
+    Analyze:
+    1. How efficiently the user is resolving tickets.
+    2. Whether their tasks appear more complex or simple.
+    3. Any patterns in delays or blockers.
+    4. Recommendations for improving their workflow.
+    """
 
-    return analysis
+    llm = Ollama(model=os.getenv("OLLAMA_MODEL"))
+    response = llm.invoke(prompt)
+    
+    return f"{issue_summary}\n\n🔍 **Analysis & Recommendations:**\n{response}"
